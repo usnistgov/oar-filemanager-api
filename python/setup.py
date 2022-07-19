@@ -15,7 +15,7 @@ setup(
     packages=find_packages(include=["nistoar", "nistoar.*"], exclude=["tests"]),
     install_requires=required,
     setup_requires=["pytest-runner", "flake8"],
-    tests_require=["pytest"],
+    tests_require=["pytest", "wsgidav"],
     entry_points={"console_scripts": ["oarfm=nistoar.filemanager.main:main"]},
     package_data={"nistoar.filemanager": ["data/*"]},
 )
