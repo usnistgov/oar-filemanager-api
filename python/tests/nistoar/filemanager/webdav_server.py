@@ -1,6 +1,4 @@
 import uvicorn
-import sys
-import logging
 from loguru import logger
 from multiprocessing import Event, Process
 from wsgidav.wsgidav_app import WsgiDAVApp
@@ -13,17 +11,16 @@ from nistoar.filemanager.util import initialize_logger
 class WebDavTestServer:
     def __init__(self, config=None, provider=None, blocking=False) -> None:
         self.config = config
+        if not config:
+            self.config = self._get_default_config(provider)
         self.provider = provider
         self.blocking = blocking
         self.process = None
-        self.start_delay = 1  # second
         self._ready = Event()
         self.ready_timeout = 5
         self.stop_timeout = 5
 
     def _run_server(self, provider=None, **kwargs):
-        if not self.config:
-            self.config = self._get_default_config(provider)
 
         app = WsgiDAVApp(self.config)
         server_args = {
@@ -42,8 +39,8 @@ class WebDavTestServer:
     @property
     def url(self):
         host = self.config["host"]
-        port = self.config["host"]
-        return f"http://{host}:{port}"
+        port = self.config["port"]
+        return str(f"http://{host}:{port}")
 
     def start(self):
         if self.blocking:
@@ -64,7 +61,7 @@ class WebDavTestServer:
                 raise TimeoutError(
                     f"WebDavTestServer timed out after {self.ready_timeout} seconds"
                 )
-            logger.info(f"WebDavTestServer is running...")
+            logger.info(f"WebDavTestServer is running on {self.url}...")
 
         return self
 
@@ -84,7 +81,7 @@ class WebDavTestServer:
 
     def _get_default_config(self, provider=None):
         tmp_dir = create_test_folder()
-        if not self.provider:
+        if not provider:
             provider = FilesystemProvider(tmp_dir)
         config = {
             "host": "127.0.0.1",
