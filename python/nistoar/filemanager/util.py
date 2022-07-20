@@ -13,17 +13,18 @@ def disable_fastapi_logging():
 
 
 NONE_LOG_LEVEL = "NONE"
+DEFAULT_LOG_LEVEL = "DEBUG"
+
+LOGURU_DEFAULT_FORMAT = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
 
 
-def initialize_logger(name, log_level):
+def initialize_logger(name, log_level=DEFAULT_LOG_LEVEL):
     logger.remove()
-    
+
     if log_level == NONE_LOG_LEVEL:
         logger.disable(name)
         return
-    
-    # Loguru default logging format
-    # "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+
     if log_level == "DEBUG":
         log_format = "<yellow>{time:YYYY-MM-DD at HH:mm:ss}</yellow> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
     else:
@@ -39,7 +40,7 @@ def create_test_folder(name="testfolder"):
     if not os.path.exists(test_tmp):
         os.makedirs(test_tmp)
     tmp_dir = tempfile.mkdtemp(dir=test_tmp)
-    logger.info(f"created temporary folder {tmp_dir}")
+    logger.debug(f"created temporary folder {tmp_dir}")
     return tmp_dir
 
 
