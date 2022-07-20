@@ -4,3 +4,5 @@ class WebDavMethod:
     MKCOL = "MKCOL"
     MOVE = "MOVE"
     COPY = "COPY"
+    LOCK = "LOCK"
+    UNLOCK = "UNLOCK"
