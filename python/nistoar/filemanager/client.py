@@ -5,13 +5,17 @@ from nistoar.filemanager.webdav import WebDavMethod
 class BaseClient:
     def __init__(self, base_url, api_url=None):
         self.base_url = base_url
-        self.api_url = api_url if str(api_url).startswith("/") else "/" + api_url
-        # TODO: add headers..what headers we need?
+        self.api_url = None
+        if api_url:
+            self.api_url = api_url if str(api_url).startswith("/") else "/" + api_url
+        # TODO: add headers. What headers we need?
         self.get_headers = {}
         self.post_headers = {}
 
     def construct_url(self, extra_url=None):
-        full_url = self.base_url + self.api_url
+        full_url = self.base_url
+        if self.api_url:
+            full_url += self.api_url
         if extra_url:
             extra_url = extra_url if str(extra_url).startswith("/") else "/" + extra_url
             full_url += extra_url
@@ -54,7 +58,7 @@ class BaseClient:
         return res
 
 
-class WebDAVClient(BaseClient):
+class WebDavClient(BaseClient):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -98,6 +102,16 @@ class WebDAVClient(BaseClient):
         headers["Destination"] = destination_url
         headers["Overwrite"] = "T" if overwrite else "F"
         res = requests.request(WebDavMethod.COPY, url=full_url, headers=headers)
+        return res
+
+    def lock(self, url, headers=None):
+        full_url = self.construct_url(extra_url=url)
+        res = requests.request(WebDavMethod.LOCK, url=full_url, headers=headers)
+        return res
+
+    def unlock(self, url, headers=None):
+        full_url = self.construct_url(extra_url=url)
+        res = requests.request(WebDavMethod.UNLOCK, url=full_url, headers=headers)
         return res
 
     def download(self, url="", headers=None, params=None):
