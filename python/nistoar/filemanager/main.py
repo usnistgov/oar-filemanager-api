@@ -12,11 +12,15 @@ ENV = os.environ.get("ENV", "dev")
 
 settings = get_settings(ENV)
 
-
+# add logic that should be run before the application starts
 @app.on_event("startup")
 async def startup_event():
     logger.debug(f"Uvicorn running on: {build_url(settings.HOST,settings.PORT)}")
 
+# add logic that should be run when the application is shutting down
+@app.on_event("shutdown")
+def shutdown_event():
+    logger.debug(f"Uvicorn shutdown")
 
 @app.get("/")
 def read_root():
