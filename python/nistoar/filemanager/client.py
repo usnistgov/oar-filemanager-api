@@ -3,6 +3,8 @@ from nistoar.filemanager.webdav import WebDavMethod
 
 
 class BaseClient:
+    """Base HTTP clients, wrapper around requests library."""
+
     def __init__(self, base_url, api_url=None):
         self.base_url = base_url
         self.api_url = None
@@ -59,6 +61,8 @@ class BaseClient:
 
 
 class WebDavClient(BaseClient):
+    """Extension of HTTP clients, to include WEBDAV additional operations."""
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
