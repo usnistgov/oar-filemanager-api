@@ -8,7 +8,7 @@ from nistoar.filemanager.config import get_settings
 app = FastAPI()
 
 APP_NAME = "nistoar.filemanager.main:app"
-ENV = os.environ.get("ENV", "dev")
+ENV = os.environ.get("ENV", "local")
 
 settings = get_settings(ENV)
 
@@ -17,10 +17,12 @@ settings = get_settings(ENV)
 async def startup_event():
     logger.debug(f"Uvicorn running on: {build_url(settings.HOST,settings.PORT)}")
 
+
 # add logic that should be run when the application is shutting down
 @app.on_event("shutdown")
 def shutdown_event():
     logger.debug(f"Uvicorn shutdown")
+
 
 @app.get("/")
 def read_root():
