@@ -40,5 +40,9 @@ class LocalSettings(BaseSettings):
 def get_settings(env="dev") -> BaseSettings:
     """Settings factory method."""
 
-    settings = {"dev": DevelopmentSettings, "prod": ProductionSettings, "local": LocalSettings}
+    settings = {
+        "dev": DevelopmentSettings,
+        "prod": ProductionSettings,
+        "local": LocalSettings,
+    }
     return settings[env]()
