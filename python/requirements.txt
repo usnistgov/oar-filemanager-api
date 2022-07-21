@@ -2,3 +2,5 @@ fastapi
 uvicorn
 wsgidav
 loguru
+pydantic
+python-dotenv
