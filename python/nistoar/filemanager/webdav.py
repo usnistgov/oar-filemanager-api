@@ -23,6 +23,15 @@ class Client:
         self._client = wd.Client(options)
         self._client.verify = verify
 
+    def build_url(self, path):
+        """Builds url using the given uri path.
+
+        :param path: uri path.
+
+        :return: the constructed url string.
+        """
+        return f"{self._client.webdav.hostname}{self._client.webdav.root}{path}"
+
     def info(self, path):
         """Get information about the resource on WebDAV server.
 
