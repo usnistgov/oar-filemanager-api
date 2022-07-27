@@ -69,6 +69,35 @@ class Client:
         """
         return self._client.mkdir(path)
 
+    def copy(self, source, destination, depth=1):
+        """Copy resource from a source to a destination on the same WebDAV server.
+
+        :param source: the path to resource which will be copied,
+        :param destination: the path where resource will be copied.
+        :param depth: folder depth to copy
+        """
+        return self._client.copy(
+            remote_path_from=source, remote_path_to=destination, depth=depth
+        )
+
+    def move(self, source, destination, overwrite=False):
+        """Move a resource from one place to another on same WebDAV server.
+
+        :param source: the path to resource which will be moved,
+        :param destination: the path where resource will be moved.
+        :param overwrite: (optional) overwrite file if True, defaults to False.
+        """
+        return self._client.move(
+            remote_path_from=source, remote_path_to=destination, overwrite=overwrite
+        )
+
+    def delete(self, path):
+        """Delete a resource on the WebDAV server.
+
+        :param path: the path to the resource to delete.
+        """
+        return self._client.clean(remote_path=path)
+
     def request(self, action, path, data=None, extra_headers=None):
         """Generate a raw request to WebDAV server using given action and path and execute it.
 
