@@ -1,4 +1,5 @@
 import uvicorn
+import docker
 from loguru import logger
 from multiprocessing import Event, Process
 from wsgidav.wsgidav_app import WsgiDAVApp
@@ -6,6 +7,99 @@ from wsgidav.fs_dav_provider import FilesystemProvider
 
 from nistoar.filemanager.util import create_test_folder
 from nistoar.filemanager.util import initialize_logger
+
+
+class BaseTestServer:
+    """Base WebDav test server class."""
+
+    def __init__(self) -> None:
+        raise NotImplementedError("Should implement this!")
+
+    def start(self):
+        raise NotImplementedError("Should implement this!")
+
+    def stop(self):
+        raise NotImplementedError("Should implement this!")
+
+    def __enter__(self):
+        raise NotImplementedError("Should implement this!")
+
+    def __exit__(self):
+        raise NotImplementedError("Should implement this!")
+
+
+class Container(BaseTestServer):
+    """BaseTestServer implmentation using a container from the Docker SDK."""
+
+    DEFAUL_IMAGE = "bytemark/webdav"
+    DEFAULT_NAME = "webdav_testserver"
+    DEFAULT_VOLUMES = ["/Users/one1/webdav:/var/lib/dav"]
+    DEFAUL_ENV = ["AUTH_TYPE=Basic", "USERNAME=login", "PASSWORD=password"]
+    DEFAULT_PORTS = {"80/tcp": 8095}
+
+    def __init__(
+        self,
+        image=DEFAUL_IMAGE,
+        name=DEFAULT_NAME,
+        volumes=DEFAULT_VOLUMES,
+        env=DEFAUL_ENV,
+        ports=DEFAULT_PORTS,
+        detach=True,
+        auto_remove=True,
+    ):
+
+        self.options = {
+            "image": image,
+            "name": name,
+            "volumes": volumes,
+            "environment": env,
+            "ports": ports,
+            "detach": detach,
+            "auto_remove": auto_remove,
+        }
+
+        self.client = docker.from_env()
+        self.container = self.client.containers.create(**self.options)
+
+    @property
+    def id(self):
+        """ID of the container."""
+        return self.container.id
+    
+    @property
+    def status(self):
+        """Status of the container."""
+        return self.container.status
+
+    def start(self):
+        """Start the container."""
+        return self.container.start()
+
+    def stop(self):
+        """Stop the container."""
+        if self.container:
+            return self.container.stop()
+
+    def remove(self):
+        if not self.options["auto_remove"] and self.container:
+            return self.container.remove()
+        self.client.close()
+
+    def __enter__(self):
+        """Implement the __enter__() method for context manager.
+
+        Starts the container.
+
+        :return: the container
+        """
+        return self.start()
+
+    def __exit__(self):
+        """Implement the __exit__() method for context manager."""
+        return self.stop()
+
+    def __del__(self):
+        return self.remove()
 
 
 class WebDavTestServer:
